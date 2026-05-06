@@ -1,3 +1,21 @@
+"""
+Emoji Crypt - Secure Emoji-Based Encryption Tool
+
+This project allows users to encrypt and hide messages inside emoji sequences
+using strong cryptography. It combines Fernet (AES + HMAC) encryption with a
+custom emoji encoding layer, transforming encrypted byte data into visually
+harmless emoji strings.
+
+Due to encryption overhead, even small messages (e.g., "test") can result in
+100+ bytes of encrypted data, which are then represented as emoji characters.
+
+GitHub Repository:
+https://github.com/ghostn4444/emoji-crypt
+
+Author:
+https://github.com/ghostn4444
+"""
+
 import base64
 import os
 import hashlib
@@ -7,15 +25,16 @@ BASE_EMOJI = 0x1F600
 
 
 def banner():
-    print("=" * 50)
-    print("🔐 EMOJI CRYPTO TOOL 🔐")
-    print("Criptografia forte + mensagens escondidas em emoji")
-    print("=" * 50)
+    print("–" * 47)
+    print(" " * 11, "🔐 EMOJI CRYPTO TOOL 🔐")
+    print(" " * 2, "Strong encryption + hidden emoji messages")
+    print(" " * 15, "BY: @ghostn4444")
+    print("–" * 47)
 
 
 def derive_key(password, salt):
     kdf = hashlib.pbkdf2_hmac(
-        'sha256',
+        "sha256",
         password.encode(),
         salt,
         100000
@@ -23,8 +42,8 @@ def derive_key(password, salt):
     return base64.urlsafe_b64encode(kdf)
 
 
-def text_to_emoji(text):
-    return ''.join(chr(BASE_EMOJI + b) for b in text)
+def text_to_emoji(data):
+    return "".join(chr(BASE_EMOJI + b) for b in data)
 
 
 def emoji_to_text(emojis):
@@ -32,8 +51,8 @@ def emoji_to_text(emojis):
 
 
 def encrypt():
-    text = input("Digite a mensagem: ")
-    password = input("Digite a senha: ")
+    text = input("Enter message: ")
+    password = input("Enter password: ")
 
     salt = os.urandom(16)
     key = derive_key(password, salt)
@@ -44,13 +63,13 @@ def encrypt():
     payload = salt + token
     emoji_msg = text_to_emoji(payload)
 
-    print("\n🔒 Mensagem criptografada:")
+    print("\n🔒 Encrypted message:")
     print(emoji_msg)
 
 
 def decrypt():
-    emoji_msg = input("Cole a mensagem em emoji: ")
-    password = input("Digite a senha: ")
+    emoji_msg = input("Paste emoji message: ")
+    password = input("Enter password: ")
 
     try:
         data = emoji_to_text(emoji_msg)
@@ -63,29 +82,30 @@ def decrypt():
 
         decrypted = f.decrypt(token).decode()
 
-        print("\n🔓 Mensagem original:")
+        print("\n🔓 Decrypted message:")
         print(decrypted)
 
     except Exception:
-        print("\n❌ Erro: senha incorreta ou mensagem inválida.")
+        print("\n❌ Error: invalid password or corrupted message.")
+
 
 def menu():
     while True:
-        print("\n1 - Criptografar")
-        print("2 - Descriptografar")
-        print("0 - Sair")
+        print("\n1 - Encrypt")
+        print("2 - Decrypt")
+        print("0 - Exit")
 
-        choice = input("Escolha: ")
+        choice = input("Choose: ")
 
         if choice == "1":
             encrypt()
         elif choice == "2":
             decrypt()
         elif choice == "0":
-            print("Saindo...")
+            print("Exiting...")
             break
         else:
-            print("Opção inválida.")
+            print("Invalid option.")
 
 
 if __name__ == "__main__":
